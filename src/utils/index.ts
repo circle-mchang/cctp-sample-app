@@ -72,3 +72,48 @@ export const numToHex = (num: number) => {
   const val = Number(num)
   return '0x' + val.toString(16)
 }
+
+/**
+ * Validates that a chain parameter object has the required fields
+ * @param chainParams the chain parameter object to validate
+ */
+export const validateChainParameters = (chainParams: unknown): chainParams is {
+  chainId: string
+  chainName: string
+  nativeCurrency: object
+  rpcUrls: string[]
+} => {
+  if (!chainParams || typeof chainParams !== 'object') {
+    return false
+  }
+
+  const params = chainParams as Record<string, unknown>
+
+  // Check basic string properties
+  if (typeof params.chainId !== 'string' || 
+      typeof params.chainName !== 'string' || 
+      typeof params.nativeCurrency !== 'object' || 
+      params.nativeCurrency === null) {
+    return false
+  }
+
+  // Check rpcUrls array
+  if (!Array.isArray(params.rpcUrls)) {
+    return false
+  }
+
+  return params.rpcUrls.length > 0
+}
+
+/**
+ * Checks if a URL is reachable
+ * @param url the URL to check
+ */
+export const isUrlReachable = async (url: string): Promise<boolean> => {
+  try {
+    await fetch(url, { method: 'HEAD', mode: 'no-cors' })
+    return true
+  } catch {
+    return false
+  }
+}
