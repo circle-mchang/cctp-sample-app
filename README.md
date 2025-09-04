@@ -1,4 +1,14 @@
-# CCTP Sample App
+# [DEPRECATED] CCTP Sample App
+
+**This project is no longer actively maintained or supported by [Circle].**
+
+This repository is kept for historical and archival purposes only. No further updates, bug fixes, or new features will be implemented by the original maintainers.
+
+**Reason for Deprecation:** The sample code shared in the repository is outdated. Our focus has shifted to providing the latest and greatest of the CCTP experience through our [developer documentation portal](https://developers.circle.com/cctp/).
+
+**Recommended Alternative:** If you are looking for similar functionality, please consider using the [CCTP QuickStart](https://developers.circle.com/cctp/transfer-usdc-on-testnet-from-ethereum-to-avalanche).
+
+# Summary
 
 A sample app used to demonstrate CCTP step by step capabilities on testnet. The app currently supports Ethereum Sepolia, Avalanche Fuji C-Chain, and Arbitrum Sepolia testnets.
 
@@ -49,7 +59,7 @@ Launch the test runner in interactive watch mode
 yarn test
 ```
 
-Run tests with test converage.
+Run tests with test coverage.
 
 ```
 yarn test:unit:coverage
@@ -76,7 +86,8 @@ yarn build
 To deploy, install and run `serve`
 
 ```
-yarn global add serve serve -s build
+yarn global add serve
+serve -s build
 ```
 
 See [deployment docs](https://facebook.github.io/create-react-app/docs/deployment) for more information.
@@ -93,7 +104,7 @@ We have two config files which will be need to be updated to add a new chain sup
 
 2. Add the addresses for the new chain
 
-- In `./src/constants/addresses.ts`, we need to add the contract addresses for the new chain to support. For `CHAIN_IDS_TO_USDC_ADDRESSES`, `CHAIN_IDS_TO_TOKEN_MESSENGER_ADDRESSES` and `CHAIN_IDS_TO_MESSAGE_TRANSMITTER_ADDRESSES`, add the coressponding addresses for the new chain. This will allow the hooks to interact with the relevant addresses
+- In `./src/constants/addresses.ts`, we need to add the contract addresses for the new chain to support. For `CHAIN_IDS_TO_USDC_ADDRESSES`, `CHAIN_IDS_TO_TOKEN_MESSENGER_ADDRESSES` and `CHAIN_IDS_TO_MESSAGE_TRANSMITTER_ADDRESSES`, add the corresponding addresses for the new chain. This will allow the hooks to interact with the relevant addresses
 
 3. Add the logo for the new chain
 
