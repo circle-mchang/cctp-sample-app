@@ -45,10 +45,15 @@ const CHAIN_SELECT_ITEMS: SelectItem[] = [
     label: CHAIN_TO_CHAIN_NAME[Chain.ARB],
     icon: CHAIN_ICONS[Chain.ARB],
   },
+  {
+    value: Chain.ARC,
+    label: CHAIN_TO_CHAIN_NAME[Chain.ARC],
+    icon: CHAIN_ICONS[Chain.ARC],
+  },
 ]
 
 export const DEFAULT_FORM_INPUTS: TransactionInputs = {
-  source: Chain.ETH,
+  source: Chain.ARC,
   target: Chain.AVAX,
   address: '',
   amount: '',
