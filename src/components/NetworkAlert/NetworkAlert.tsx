@@ -1,6 +1,7 @@
+import { useEffect, useState } from 'react'
+
 import { Alert, Button, CircularProgress, Snackbar } from '@mui/material'
 import { useWeb3React } from '@web3-react/core'
-import { useEffect, useState } from 'react'
 
 import { CHAIN_TO_CHAIN_ID } from 'constants/chains'
 import useSwitchNetwork from 'hooks/useSwitchNetwork'
@@ -41,7 +42,11 @@ const NetworkAlert: React.FC<Props> = ({ chain, className }) => {
               size="small"
               onClick={handleSwitchNetwork}
               disabled={switchResult.isLoading}
-              startIcon={switchResult.isLoading ? <CircularProgress size={16} /> : undefined}
+              startIcon={
+                switchResult.isLoading ? (
+                  <CircularProgress size={16} />
+                ) : undefined
+              }
             >
               {switchResult.isLoading ? 'Switching...' : 'Switch'}
             </Button>
@@ -49,7 +54,7 @@ const NetworkAlert: React.FC<Props> = ({ chain, className }) => {
         >
           Source chain and selected network in wallet must be the same
         </Alert>
-        
+
         <Snackbar
           open={showErrorSnackbar}
           autoHideDuration={6000}

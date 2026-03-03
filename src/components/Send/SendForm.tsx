@@ -92,6 +92,12 @@ const SendForm = ({ handleNext, handleUpdateForm, formInputs }: Props) => {
     }
   }, [account, active, balance])
 
+  useEffect(() => {
+    if (account && active) {
+      handleUpdateForm((state) => ({ ...state, address: account }))
+    }
+  }, [account, active, handleUpdateForm])
+
   useEffect(updateFormIsValid, [updateFormIsValid])
 
   const renderChainMenuItem = (chain: SelectItem, disabledValue = '') => (

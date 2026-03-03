@@ -48,9 +48,9 @@ interface ChainToChainNameMap {
  * Maps a chain to it's readable name
  */
 export const CHAIN_TO_CHAIN_NAME: ChainToChainNameMap = {
-  ETH: 'Ethereum',
-  AVAX: 'Avalanche',
-  ARB: 'Arbitrum',
+  ETH: 'Ethereum Sepolia',
+  AVAX: 'Avalanche Fuji',
+  ARB: 'Arbitrum Sepolia',
 }
 
 /**
@@ -92,7 +92,10 @@ const ETH_SEPOLIA: AddEthereumChainParameter = {
     symbol: 'ETH',
     decimals: 18,
   },
-  rpcUrls: ['https://rpc.sepolia.org', 'https://ethereum-sepolia-rpc.publicnode.com'],
+  rpcUrls: [
+    'https://rpc.sepolia.org',
+    'https://ethereum-sepolia-rpc.publicnode.com',
+  ],
 }
 
 const AVAX_FUJI: AddEthereumChainParameter = {
@@ -116,7 +119,10 @@ const ARB_SEPOLIA: AddEthereumChainParameter = {
     symbol: 'ETH',
     decimals: 18,
   },
-  rpcUrls: ['https://sepolia-rollup.arbitrum.io/rpc', 'https://arbitrum-sepolia.public.blastapi.io'],
+  rpcUrls: [
+    'https://sepolia-rollup.arbitrum.io/rpc',
+    'https://arbitrum-sepolia.public.blastapi.io',
+  ],
 }
 
 interface ChainIdToChainParameters {

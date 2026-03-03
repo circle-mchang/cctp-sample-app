@@ -102,6 +102,7 @@ export function useTransactionPolling(handleComplete: () => void) {
           ) {
             const newTransaction: Transaction = {
               ...transaction,
+              status: TransactionStatus.COMPLETE,
               messageBytes: message as unknown as Bytes,
               signature,
             }
