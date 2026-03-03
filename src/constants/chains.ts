@@ -59,6 +59,15 @@ export const CHAIN_TO_CHAIN_NAME: ChainToChainNameMap = {
 }
 
 /**
+ * Maps a chain to its block explorer base URL
+ */
+export const CHAIN_TO_EXPLORER_URL: ChainToChainNameMap = {
+  ETH: 'https://sepolia.etherscan.io',
+  AVAX: 'https://testnet.snowtrace.io',
+  ARB: 'https://sepolia.arbiscan.io',
+}
+
+/**
  * Array of all the supported chain IDs
  */
 export const ALL_SUPPORTED_CHAIN_IDS: SupportedChainId[] = Object.values(

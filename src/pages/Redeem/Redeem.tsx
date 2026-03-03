@@ -16,10 +16,14 @@ function Redeem() {
   const [isConfirmationDialogOpen, setIsConfirmationDialogOpen] =
     useState(false)
   const [isTransactionDialogOpen, setIsTransactionDialogOpen] = useState(false)
+  const [isRedeemComplete, setIsRedeemComplete] = useState(false)
   const { txHash, transaction, setSearchParams } = useQueryParam()
   const navigate = useNavigate()
 
   useEffect(() => {
+    // While showing the success screen, don't change dialog state
+    if (isRedeemComplete) return
+
     if (transaction) {
       if (transaction.type === TransactionType.SEND) {
         // If send tx is incomplete or signature is missing, redirect to Send page
@@ -61,20 +65,28 @@ function Redeem() {
         setIsTransactionDialogOpen(true)
       }
     }
-  }, [navigate, setSearchParams, transaction, txHash])
+  }, [navigate, setSearchParams, transaction, txHash, isRedeemComplete])
 
   const handleNext = (txHash: string) => {
     setSearchParams({ [TX_HASH_KEY]: txHash }, { replace: true })
   }
 
   const handleConfirmation = (txHash: string) => {
+    setIsRedeemComplete(false)
     setSearchParams({ [TX_HASH_KEY]: txHash }, { replace: true })
     setIsConfirmationDialogOpen(false)
     setIsTransactionDialogOpen(true)
   }
 
+  // Called by polling when redeem tx is confirmed — show success screen
   const handleComplete = () => {
+    setIsRedeemComplete(true)
+  }
+
+  // Called when user clicks "Done" on the success screen
+  const handleContinue = () => {
     setIsTransactionDialogOpen(false)
+    setIsRedeemComplete(false)
   }
 
   const handleReturn = () => {
@@ -138,6 +150,8 @@ function Redeem() {
           handleTransactionPolling={handleRedeemTransactionPolling}
           open={isTransactionDialogOpen}
           transaction={transaction}
+          isComplete={isRedeemComplete}
+          onContinue={handleContinue}
         />
       )}
     </>

@@ -17,10 +17,14 @@ function Send() {
   const [isConfirmationDialogOpen, setIsConfirmationDialogOpen] =
     useState(false)
   const [isTransactionDialogOpen, setIsTransactionDialogOpen] = useState(false)
+  const [isSendComplete, setIsSendComplete] = useState(false)
   const { txHash, transaction, setSearchParams } = useQueryParam()
   const navigate = useNavigate()
 
   useEffect(() => {
+    // While showing the success screen, don't auto-navigate away
+    if (isSendComplete) return
+
     // Redirect to Redeem page if send tx is complete and signature is fetched or it's a redeem tx
     if (
       transaction &&
@@ -43,20 +47,28 @@ function Send() {
     } else if (txHash) {
       setIsTransactionDialogOpen(true)
     }
-  }, [navigate, transaction, txHash])
+  }, [navigate, transaction, txHash, isSendComplete])
 
   const handleNext = () => {
     setIsConfirmationDialogOpen(true)
   }
 
   const handleConfirmation = (txHash: string) => {
+    setIsSendComplete(false)
     setIsConfirmationDialogOpen(false)
     setSearchParams({ [TX_HASH_KEY]: txHash }, { replace: true })
     setIsTransactionDialogOpen(true)
   }
 
+  // Called by polling when attestation is ready — show success screen
   const handleComplete = () => {
+    setIsSendComplete(true)
+  }
+
+  // Called when user clicks "Continue" on the success screen
+  const handleContinue = () => {
     setIsTransactionDialogOpen(false)
+    setIsSendComplete(false)
     navigate({
       pathname: '/redeem',
       search: createSearchParams({
@@ -100,6 +112,8 @@ function Send() {
           handleTransactionPolling={handleSendTransactionPolling}
           open={isTransactionDialogOpen}
           transaction={transaction}
+          isComplete={isSendComplete}
+          onContinue={handleContinue}
         />
       )}
     </>
