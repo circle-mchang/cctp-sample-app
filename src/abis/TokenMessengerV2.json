@@ -1,0 +1,30 @@
+[
+  {
+    "inputs": [
+      { "internalType": "uint256", "name": "amount", "type": "uint256" },
+      {
+        "internalType": "uint32",
+        "name": "destinationDomain",
+        "type": "uint32"
+      },
+      { "internalType": "bytes32", "name": "mintRecipient", "type": "bytes32" },
+      { "internalType": "address", "name": "burnToken", "type": "address" },
+      {
+        "internalType": "bytes32",
+        "name": "destinationCaller",
+        "type": "bytes32"
+      },
+      {
+        "internalType": "uint32",
+        "name": "minFinalityThreshold",
+        "type": "uint32"
+      }
+    ],
+    "name": "depositForBurnWithHook",
+    "outputs": [
+      { "internalType": "bytes32", "name": "_messageHash", "type": "bytes32" }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  }
+]

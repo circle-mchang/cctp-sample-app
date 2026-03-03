@@ -11,6 +11,11 @@ import type {
 } from '@ethersproject/providers'
 import type { BigNumber } from 'ethers'
 
+interface TxOverrides {
+  maxFeePerGas?: BigNumber
+  maxPriorityFeePerGas?: BigNumber
+}
+
 interface TokenApprovalResponse {
   approve: (amountToApprove: BigNumber) => Promise<
     | {
@@ -39,11 +44,20 @@ const useTokenApproval = (
     async (amountToApprove: BigNumber) => {
       if (!library) return
       const token = Erc20__factory.connect(tokenAddress, library.getSigner())
+      const feeData = await library.getFeeData()
+      const gasOverrides: TxOverrides = {
+        maxFeePerGas:
+          feeData.maxFeePerGas != null
+            ? feeData.maxFeePerGas.mul(12).div(10)
+            : undefined,
+        maxPriorityFeePerGas: feeData.maxPriorityFeePerGas ?? undefined,
+      }
 
       return await token
         .approve(
           spenderAddress,
-          useExact ? amountToApprove.toString() : MaxUint256
+          useExact ? amountToApprove.toString() : MaxUint256,
+          gasOverrides
         )
         .then((response: TransactionResponse) => {
           return {

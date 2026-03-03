@@ -16,7 +16,7 @@ const useContract = (address: string, withSigner = true) => {
 
   return useMemo(
     () =>
-      library != null
+      library != null && address !== ''
         ? Erc20__factory.connect(
             address,
             withSigner ? library.getSigner() : library

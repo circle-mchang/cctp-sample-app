@@ -32,3 +32,20 @@ export const CHAIN_IDS_TO_MESSAGE_TRANSMITTER_ADDRESSES = {
 
   [SupportedChainId.ARB_SEPOLIA]: '0xacf1ceef35caac005e15888ddb8a3515c41b4872',
 }
+
+/**
+ * V2 contracts: TokenMessengerV2 and MessageTransmitterV2
+ * Per Circle docs, these addresses are identical across supported chains.
+ * https://developers.circle.com/cctp/evm-smart-contracts
+ */
+export const CHAIN_IDS_TO_TOKEN_MESSENGER_V2_ADDRESSES = {
+  [SupportedChainId.ETH_SEPOLIA]: '0x8FE6B999Dc680CcFDD5Bf7EB0974218be2542DAA',
+  [SupportedChainId.AVAX_FUJI]: '0x8FE6B999Dc680CcFDD5Bf7EB0974218be2542DAA',
+  [SupportedChainId.ARB_SEPOLIA]: '0x8FE6B999Dc680CcFDD5Bf7EB0974218be2542DAA',
+}
+
+export const CHAIN_IDS_TO_MESSAGE_TRANSMITTER_V2_ADDRESSES = {
+  [SupportedChainId.ETH_SEPOLIA]: '0xE737e5cEBEEBa77EFE34D4aa090756590b1CE275',
+  [SupportedChainId.AVAX_FUJI]: '0xE737e5cEBEEBa77EFE34D4aa090756590b1CE275',
+  [SupportedChainId.ARB_SEPOLIA]: '0xE737e5cEBEEBa77EFE34D4aa090756590b1CE275',
+}

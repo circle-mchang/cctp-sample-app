@@ -1,52 +1,38 @@
 import { useState } from 'react'
 
+import { DestinationDomain } from 'constants/chains'
 import { DEFAULT_API_DELAY, DEFAULT_BLOCKCHAIN_DELAY } from 'constants/index'
 import { TransactionStatus, useTransactionContext } from 'contexts/AppContext'
 import { useQueryParam } from 'hooks/useQueryParam'
 import useTransaction from 'hooks/useTransaction'
-import { AttestationStatus, getAttestation } from 'services/attestationService'
-import { getMessageBytesFromEventLogs, getMessageHashFromBytes } from 'utils'
+import {
+  AttestationStatus,
+  getAttestationByTransaction,
+} from 'services/attestationService'
 
 import type { Transaction } from 'contexts/AppContext'
 import type { Bytes } from 'ethers'
-
-interface HandleTransactionReceiptPollingParams {
-  messageBytes: Bytes
-  messageHash: string
-}
 
 export function useTransactionPolling(handleComplete: () => void) {
   const { getTransactionReceipt } = useTransaction()
   const { setTransaction } = useTransactionContext()
   const { txHash, transaction } = useQueryParam()
-  const [messageHash, setMessageHash] = useState(transaction?.messageHash)
   const [signature, setSignature] = useState(transaction?.signature)
 
   const handleTransactionReceiptPolling = (
-    handleSuccess: (params?: HandleTransactionReceiptPollingParams) => void,
-    hash: string,
-    messageType?: string
+    handleSuccess: () => void,
+    hash: string
   ) => {
     // Polling transaction receipt until status = 1
     const interval = setInterval(async () => {
       const transactionReceipt = await getTransactionReceipt(hash)
       if (transactionReceipt != null) {
-        const { status, logs } = transactionReceipt
+        const { status } = transactionReceipt
 
         // Success
         if (status === 1) {
           clearInterval(interval)
-
-          if (messageType) {
-            // decode log to get messageBytes
-            const messageBytes = getMessageBytesFromEventLogs(logs, messageType)
-            // hash the message bytes
-            const messageHash = getMessageHashFromBytes(messageBytes)
-
-            return handleSuccess({ messageBytes, messageHash })
-          } else {
-            return handleSuccess()
-          }
+          return handleSuccess()
         }
       }
     }, DEFAULT_BLOCKCHAIN_DELAY)
@@ -65,28 +51,16 @@ export function useTransactionPolling(handleComplete: () => void) {
 
   const handleSendTransactionReceiptPolling = () => {
     if (transaction) {
-      const handleSuccess = (
-        params?: HandleTransactionReceiptPollingParams
-      ) => {
-        if (params) {
-          const { messageBytes, messageHash } = params
-          const newTransaction: Transaction = {
-            ...transaction,
-            status: TransactionStatus.COMPLETE,
-            messageBytes,
-            messageHash,
-          }
-          setTransaction(txHash, newTransaction)
-          setMessageHash(messageHash)
-
-          return handleAttestationPolling()
+      const handleSuccess = () => {
+        const newTransaction: Transaction = {
+          ...transaction,
+          status: TransactionStatus.COMPLETE,
         }
+        setTransaction(txHash, newTransaction)
+
+        return handleAttestationPolling()
       }
-      return handleTransactionReceiptPolling(
-        handleSuccess,
-        txHash,
-        'MessageSent(bytes)'
-      )
+      return handleTransactionReceiptPolling(handleSuccess, txHash)
     }
   }
 
@@ -106,21 +80,33 @@ export function useTransactionPolling(handleComplete: () => void) {
   }
 
   const handleAttestationPolling = () => {
-    if (txHash && transaction && messageHash) {
+    if (txHash && transaction) {
       // Polling transaction receipt until status = complete
       const interval = setInterval(async () => {
-        const attestation = await getAttestation(messageHash)
+        const sourceDomainId =
+          DestinationDomain[
+            transaction.source as keyof typeof DestinationDomain
+          ]
+        const attestation = await getAttestationByTransaction(
+          sourceDomainId,
+          txHash
+        )
         if (attestation != null) {
-          const { status, message } = attestation
+          const { attestation: signature, message, status } = attestation
 
           // Success
-          if (status === AttestationStatus.complete && message !== null) {
+          if (
+            status === AttestationStatus.complete &&
+            signature !== null &&
+            message !== null
+          ) {
             const newTransaction: Transaction = {
               ...transaction,
-              signature: message,
+              messageBytes: message as unknown as Bytes,
+              signature,
             }
             setTransaction(txHash, newTransaction)
-            setSignature(message)
+            setSignature(signature)
 
             handleComplete()
             clearInterval(interval)
