@@ -40,7 +40,8 @@ const TransactionDialog: React.FC<Props> = ({
 
   useEffect(() => {
     return handleTransactionPolling()
-  }, [handleTransactionPolling])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   const chainIcons = useMemo(() => {
     const source = CHAIN_ICONS[transaction.source as Chain]
