@@ -6,7 +6,7 @@ export const getUSDCContractAddress = (chainId?: SupportedChainId): string => {
   if (chainId == null) {
     return ''
   }
-  return testnet.CHAIN_IDS_TO_USDC_ADDRESSES[chainId]
+  return testnet.CHAIN_IDS_TO_USDC_ADDRESSES[chainId] ?? ''
 }
 
 export const getTokenMessengerContractAddress = (
@@ -15,7 +15,7 @@ export const getTokenMessengerContractAddress = (
   if (chainId == null) {
     return ''
   }
-  return testnet.CHAIN_IDS_TO_TOKEN_MESSENGER_ADDRESSES[chainId]
+  return testnet.CHAIN_IDS_TO_TOKEN_MESSENGER_ADDRESSES[chainId] ?? ''
 }
 
 export const getMessageTransmitterContractAddress = (
@@ -24,5 +24,23 @@ export const getMessageTransmitterContractAddress = (
   if (chainId == null) {
     return ''
   }
-  return testnet.CHAIN_IDS_TO_MESSAGE_TRANSMITTER_ADDRESSES[chainId]
+  return testnet.CHAIN_IDS_TO_MESSAGE_TRANSMITTER_ADDRESSES[chainId] ?? ''
+}
+
+export const getTokenMessengerV2ContractAddress = (
+  chainId?: SupportedChainId
+): string => {
+  if (chainId == null) {
+    return ''
+  }
+  return testnet.CHAIN_IDS_TO_TOKEN_MESSENGER_V2_ADDRESSES[chainId] ?? ''
+}
+
+export const getMessageTransmitterV2ContractAddress = (
+  chainId?: SupportedChainId
+): string => {
+  if (chainId == null) {
+    return ''
+  }
+  return testnet.CHAIN_IDS_TO_MESSAGE_TRANSMITTER_V2_ADDRESSES[chainId] ?? ''
 }

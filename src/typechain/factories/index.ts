@@ -2,5 +2,7 @@
 /* tslint:disable */
 /* eslint-disable */
 export { MessageTransmitter__factory } from './MessageTransmitter__factory'
+export { MessageTransmitterV2__factory } from './MessageTransmitterV2__factory'
 export { TokenMessenger__factory } from './TokenMessenger__factory'
+export { TokenMessengerV2__factory } from './TokenMessengerV2__factory'
 export { Erc20__factory } from './Erc20__factory'

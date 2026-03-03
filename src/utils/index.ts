@@ -44,6 +44,9 @@ export function getMessageBytesFromEventLogs(
 ): Bytes {
   const eventTopic = id(topic)
   const log = logs.filter((l) => l.topics[0] === eventTopic)[0]
+  if (log == null) {
+    throw new Error(`Event topic "${topic}" not found in transaction logs`)
+  }
   return defaultAbiCoder.decode(['bytes'], log.data)[0] as Bytes
 }
 
@@ -77,23 +80,27 @@ export const numToHex = (num: number) => {
  * Validates that a chain parameter object has the required fields
  * @param chainParams the chain parameter object to validate
  */
-export const validateChainParameters = (chainParams: unknown): chainParams is {
+export const validateChainParameters = (
+  chainParams: unknown
+): chainParams is {
   chainId: string
   chainName: string
   nativeCurrency: object
   rpcUrls: string[]
 } => {
-  if (!chainParams || typeof chainParams !== 'object') {
+  if (chainParams == null || typeof chainParams !== 'object') {
     return false
   }
 
   const params = chainParams as Record<string, unknown>
 
   // Check basic string properties
-  if (typeof params.chainId !== 'string' || 
-      typeof params.chainName !== 'string' || 
-      typeof params.nativeCurrency !== 'object' || 
-      params.nativeCurrency === null) {
+  if (
+    typeof params.chainId !== 'string' ||
+    typeof params.chainName !== 'string' ||
+    typeof params.nativeCurrency !== 'object' ||
+    params.nativeCurrency === null
+  ) {
     return false
   }
 

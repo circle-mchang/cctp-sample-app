@@ -2,9 +2,13 @@
 /* tslint:disable */
 /* eslint-disable */
 export type { MessageTransmitter } from './MessageTransmitter'
+export type { MessageTransmitterV2 } from './MessageTransmitterV2'
 export type { TokenMessenger } from './TokenMessenger'
+export type { TokenMessengerV2 } from './TokenMessengerV2'
 export type { Erc20 } from './Erc20'
 export * as factories from './factories'
-export { MessageTransmitter__factory } from './factories/MessageTransmitter__factory'
-export { TokenMessenger__factory } from './factories/TokenMessenger__factory'
 export { Erc20__factory } from './factories/Erc20__factory'
+export { MessageTransmitter__factory } from './factories/MessageTransmitter__factory'
+export { MessageTransmitterV2__factory } from './factories/MessageTransmitterV2__factory'
+export { TokenMessenger__factory } from './factories/TokenMessenger__factory'
+export { TokenMessengerV2__factory } from './factories/TokenMessengerV2__factory'

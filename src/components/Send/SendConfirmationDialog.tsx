@@ -28,7 +28,7 @@ import useTokenApproval from 'hooks/useTokenApproval'
 import useTokenMessenger from 'hooks/useTokenMessenger'
 import { useTransactionPolling } from 'hooks/useTransactionPolling'
 import {
-  getTokenMessengerContractAddress,
+  getTokenMessengerV2ContractAddress,
   getUSDCContractAddress,
 } from 'utils/addresses'
 
@@ -60,14 +60,14 @@ const SendConfirmationDialog: React.FC<Props> = ({
   const [isSending, setIsSending] = useState(false)
 
   const USDC_ADDRESS = getUSDCContractAddress(chainId)
-  const TOKEN_MESSENGER_ADDRESS = getTokenMessengerContractAddress(chainId)
+  const TOKEN_MESSENGER_V2_ADDRESS = getTokenMessengerV2ContractAddress(chainId)
 
-  const { approve } = useTokenApproval(USDC_ADDRESS, TOKEN_MESSENGER_ADDRESS)
+  const { approve } = useTokenApproval(USDC_ADDRESS, TOKEN_MESSENGER_V2_ADDRESS)
   const { depositForBurn } = useTokenMessenger(chainId)
   const allowance = useTokenAllowance(
     USDC_ADDRESS,
     account ?? '',
-    TOKEN_MESSENGER_ADDRESS
+    TOKEN_MESSENGER_V2_ADDRESS
   )
   const { addTransaction } = useTransactionContext()
 
