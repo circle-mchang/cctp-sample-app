@@ -1,9 +1,11 @@
 import { useEffect, useState } from 'react'
 
+import BoltIcon from '@mui/icons-material/Bolt'
 import CloseIcon from '@mui/icons-material/Close'
 import { LoadingButton } from '@mui/lab'
 import {
   Button,
+  CircularProgress,
   Dialog,
   DialogActions,
   DialogContent,
@@ -13,6 +15,9 @@ import {
   Step,
   StepLabel,
   Stepper,
+  ToggleButton,
+  ToggleButtonGroup,
+  Tooltip,
 } from '@mui/material'
 import { useWeb3React } from '@web3-react/core'
 import { parseUnits } from 'ethers/lib/utils'
@@ -26,6 +31,7 @@ import {
   TransactionType,
   useTransactionContext,
 } from 'contexts/AppContext'
+import useFastTransferFee from 'hooks/useFastTransferFee'
 import useTokenAllowance from 'hooks/useTokenAllowance'
 import useTokenApproval from 'hooks/useTokenApproval'
 import useTokenMessenger from 'hooks/useTokenMessenger'
@@ -39,7 +45,7 @@ import type { Web3Provider } from '@ethersproject/providers'
 import type { SxProps } from '@mui/material'
 import type { Chain } from 'constants/chains'
 import type { TransactionInputs } from 'contexts/AppContext'
-import type { BigNumber } from 'ethers'
+import type { BigNumber as EthersBigNumber } from 'ethers'
 
 interface Props {
   handleClose: () => void
@@ -57,10 +63,16 @@ const SendConfirmationDialog: React.FC<Props> = ({
   sx = {},
 }) => {
   const { account, active, chainId } = useWeb3React<Web3Provider>()
-  const { target, address, amount } = formInputs
+  const { source, target, address, amount } = formInputs
   const [isAllowanceSufficient, setIsAllowanceSufficient] = useState(false)
   const [isApproving, setIsApproving] = useState(false)
   const [isSending, setIsSending] = useState(false)
+  const [isFastTransfer, setIsFastTransfer] = useState(true)
+
+  const { fastFee, loading: feeLoading } = useFastTransferFee(
+    source as Chain,
+    target as Chain
+  )
 
   const USDC_ADDRESS = getUSDCContractAddress(chainId)
   const TOKEN_MESSENGER_V2_ADDRESS = getTokenMessengerV2ContractAddress(chainId)
@@ -93,7 +105,7 @@ const SendConfirmationDialog: React.FC<Props> = ({
   )
 
   const handleApprove = async () => {
-    const amountToApprove: BigNumber = parseUnits(
+    const amountToApprove: EthersBigNumber = parseUnits(
       amount.toString(),
       DEFAULT_DECIMALS
     )
@@ -113,10 +125,13 @@ const SendConfirmationDialog: React.FC<Props> = ({
   }
 
   const handleSend = async () => {
-    const amountToSend: BigNumber = parseUnits(
+    const amountToSend: EthersBigNumber = parseUnits(
       amount.toString(),
       DEFAULT_DECIMALS
     )
+
+    const maxFee = isFastTransfer && fastFee != null ? fastFee : 0
+    const minFinalityThreshold = isFastTransfer && fastFee != null ? 1000 : 2000
 
     setIsSending(true)
     try {
@@ -124,7 +139,9 @@ const SendConfirmationDialog: React.FC<Props> = ({
         amountToSend,
         DestinationDomain[target as Chain],
         address,
-        USDC_ADDRESS
+        USDC_ADDRESS,
+        maxFee,
+        minFinalityThreshold
       )
       if (!response) return
 
@@ -178,9 +195,56 @@ const SendConfirmationDialog: React.FC<Props> = ({
         ) : (
           <DialogContentText className="mb-6">
             Spending cap approved. Confirm the details below and click{' '}
-            <strong>Send</strong> to submit the cross-chain transfer.
+            <strong>Send</strong> to submit the cross-chain transfer.{' '}
+            {isFastTransfer && fastFee != null
+              ? 'Funds typically arrive in seconds.'
+              : 'Funds typically arrive in ~15 minutes.'}
           </DialogContentText>
         )}
+
+        <div className="mb-6 flex items-center gap-4">
+          <span className="text-sm font-medium">Transfer speed</span>
+          <ToggleButtonGroup
+            exclusive
+            size="small"
+            value={isFastTransfer ? 'fast' : 'standard'}
+            onChange={(_e, val) => {
+              if (val != null) setIsFastTransfer(val === 'fast')
+            }}
+          >
+            <Tooltip
+              title={
+                fastFee == null && !feeLoading
+                  ? 'Fast Transfer is not available for this route'
+                  : 'Attestation in seconds · small fee deducted from received amount'
+              }
+            >
+              <span>
+                <ToggleButton
+                  value="fast"
+                  disabled={feeLoading || fastFee == null}
+                >
+                  {feeLoading ? (
+                    <CircularProgress size={14} className="mr-1" />
+                  ) : (
+                    <BoltIcon fontSize="small" className="mr-1" />
+                  )}
+                  Fast
+                </ToggleButton>
+              </span>
+            </Tooltip>
+            <Tooltip title="Free · attestation after hard finality (~15 min)">
+              <span>
+                <ToggleButton value="standard">Standard</ToggleButton>
+              </span>
+            </Tooltip>
+          </ToggleButtonGroup>
+          {isFastTransfer && fastFee != null && (
+            <span className="text-zinc-500 text-sm">
+              Fee: ~{(Number(fastFee.toString()) / 1_000_000).toFixed(4)} USDC
+            </span>
+          )}
+        </div>
 
         <TransactionDetails transaction={formInputs} />
 
