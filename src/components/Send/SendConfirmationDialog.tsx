@@ -1,16 +1,13 @@
 import { useEffect, useState } from 'react'
 
-import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline'
 import CloseIcon from '@mui/icons-material/Close'
-import LockOpenIcon from '@mui/icons-material/LockOpen'
-import SendIcon from '@mui/icons-material/Send'
 import { LoadingButton } from '@mui/lab'
 import {
-  Alert,
   Button,
   Dialog,
   DialogActions,
   DialogContent,
+  DialogContentText,
   DialogTitle,
   IconButton,
   Step,
@@ -51,8 +48,6 @@ interface Props {
   formInputs: TransactionInputs
   sx?: SxProps
 }
-
-const STEPS = ['Approve Spending Cap', 'Send Transfer']
 
 const SendConfirmationDialog: React.FC<Props> = ({
   handleClose,
@@ -153,7 +148,6 @@ const SendConfirmationDialog: React.FC<Props> = ({
   }
 
   const activeStep = isAllowanceSufficient ? 1 : 0
-  const isWrongNetwork = CHAIN_TO_CHAIN_ID[formInputs.source] !== chainId
 
   return (
     <Dialog
@@ -163,42 +157,29 @@ const SendConfirmationDialog: React.FC<Props> = ({
       open={open}
       sx={sx}
     >
-      <DialogTitle>Confirm Transfer</DialogTitle>
+      <DialogTitle>Send transfer</DialogTitle>
 
       <DialogContent>
         <Stepper activeStep={activeStep} className="mb-8">
-          {STEPS.map((label, index) => (
-            <Step key={label} completed={index < activeStep}>
-              <StepLabel>{label}</StepLabel>
-            </Step>
-          ))}
+          <Step completed={isAllowanceSufficient}>
+            <StepLabel>Approve spending cap</StepLabel>
+          </Step>
+          <Step>
+            <StepLabel>Send transfer</StepLabel>
+          </Step>
         </Stepper>
 
         {!isAllowanceSufficient ? (
-          <Alert severity="info" icon={<LockOpenIcon />} className="mb-6">
-            <strong>Step 1 of 2 — Approve Spending Cap</strong>
-            <br />
-            You must authorize the CCTP contract to spend{' '}
-            <strong>{amount} USDC</strong> on your behalf. Your wallet will ask
-            you to set a spending cap — enter at least{' '}
-            <strong>{amount} USDC</strong> and confirm.
-            {isApproving && (
-              <span className="mt-2 block text-sm opacity-75">
-                Waiting for approval confirmation on-chain…
-              </span>
-            )}
-          </Alert>
+          <DialogContentText className="mb-6">
+            Before sending, you must authorize the CCTP contract to spend{' '}
+            <strong>{amount} USDC</strong> on your behalf. This is a one-time
+            wallet transaction for this amount.
+          </DialogContentText>
         ) : (
-          <Alert
-            severity="success"
-            icon={<CheckCircleOutlineIcon />}
-            className="mb-6"
-          >
-            <strong>Step 1 complete — Spending cap approved</strong>
-            <br />
-            Your USDC spending cap is set. Click <strong>SEND</strong> below to
-            initiate the cross-chain transfer.
-          </Alert>
+          <DialogContentText className="mb-6">
+            Spending cap approved. Confirm the details below and click{' '}
+            <strong>Send</strong> to submit the cross-chain transfer.
+          </DialogContentText>
         )}
 
         <TransactionDetails transaction={formInputs} />
@@ -213,22 +194,24 @@ const SendConfirmationDialog: React.FC<Props> = ({
         {!isAllowanceSufficient ? (
           <LoadingButton
             size="large"
-            startIcon={<LockOpenIcon />}
+            variant="contained"
             onClick={handleApprove}
-            disabled={isApproving || isWrongNetwork}
+            disabled={
+              isApproving || CHAIN_TO_CHAIN_ID[formInputs.source] !== chainId
+            }
             loading={isApproving}
-            loadingPosition="start"
           >
-            APPROVE SPENDING CAP
+            APPROVE {amount} USDC
           </LoadingButton>
         ) : (
           <LoadingButton
             size="large"
-            startIcon={<SendIcon />}
+            variant="contained"
             onClick={handleSend}
-            disabled={isSending || isWrongNetwork}
+            disabled={
+              isSending || CHAIN_TO_CHAIN_ID[formInputs.source] !== chainId
+            }
             loading={isSending}
-            loadingPosition="start"
           >
             SEND
           </LoadingButton>
