@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react'
 import { Alert, Button, CircularProgress, Snackbar } from '@mui/material'
 import { useWeb3React } from '@web3-react/core'
 
-import { CHAIN_TO_CHAIN_ID } from 'constants/chains'
+import { CHAIN_TO_CHAIN_ID, CHAIN_TO_CHAIN_NAME } from 'constants/chains'
 import useSwitchNetwork from 'hooks/useSwitchNetwork'
 
 import type { Web3Provider } from '@ethersproject/providers'
@@ -52,7 +52,8 @@ const NetworkAlert: React.FC<Props> = ({ chain, className }) => {
             </Button>
           }
         >
-          Source chain and selected network in wallet must be the same
+          Your wallet is not connected to {CHAIN_TO_CHAIN_NAME[chain]}. Click
+          Switch to add and connect the network.
         </Alert>
 
         <Snackbar
