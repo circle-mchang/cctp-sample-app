@@ -53,7 +53,7 @@ const CHAIN_SELECT_ITEMS: SelectItem[] = [
 ]
 
 export const DEFAULT_FORM_INPUTS: TransactionInputs = {
-  source: Chain.ARC,
+  source: Chain.ETH,
   target: Chain.AVAX,
   address: '',
   amount: '',

@@ -138,7 +138,6 @@ const ARB_SEPOLIA: AddEthereumChainParameter = {
     'https://sepolia-rollup.arbitrum.io/rpc',
     'https://arbitrum-sepolia.public.blastapi.io',
   ],
-
 }
 
 const ARC_TESTNET: AddEthereumChainParameter = {
@@ -155,7 +154,6 @@ const ARC_TESTNET: AddEthereumChainParameter = {
     'https://rpc.quicknode.testnet.arc.network',
     'https://rpc.blockdaemon.testnet.arc.network',
   ],
-
 }
 
 interface ChainIdToChainParameters {
