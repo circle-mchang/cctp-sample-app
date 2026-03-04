@@ -16,14 +16,10 @@ function Redeem() {
   const [isConfirmationDialogOpen, setIsConfirmationDialogOpen] =
     useState(false)
   const [isTransactionDialogOpen, setIsTransactionDialogOpen] = useState(false)
-  const [isRedeemComplete, setIsRedeemComplete] = useState(false)
   const { txHash, transaction, setSearchParams } = useQueryParam()
   const navigate = useNavigate()
 
   useEffect(() => {
-    // While showing the success screen, don't change dialog state
-    if (isRedeemComplete) return
-
     if (transaction) {
       if (transaction.type === TransactionType.SEND) {
         // If send tx is incomplete or signature is missing, redirect to Send page
@@ -65,28 +61,25 @@ function Redeem() {
         setIsTransactionDialogOpen(true)
       }
     }
-  }, [navigate, setSearchParams, transaction, txHash, isRedeemComplete])
+  }, [navigate, setSearchParams, transaction, txHash])
 
   const handleNext = (txHash: string) => {
     setSearchParams({ [TX_HASH_KEY]: txHash }, { replace: true })
   }
 
   const handleConfirmation = (txHash: string) => {
-    setIsRedeemComplete(false)
     setSearchParams({ [TX_HASH_KEY]: txHash }, { replace: true })
     setIsConfirmationDialogOpen(false)
     setIsTransactionDialogOpen(true)
   }
 
-  // Called by polling when redeem tx is confirmed — show success screen
-  const handleComplete = () => {
-    setIsRedeemComplete(true)
-  }
+  // isComplete is derived from transaction state inside TransactionDialog — no-op here
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  const handleComplete = () => {}
 
   // Called when user clicks "Done" on the success screen
   const handleContinue = () => {
     setIsTransactionDialogOpen(false)
-    setIsRedeemComplete(false)
   }
 
   const handleReturn = () => {
@@ -150,7 +143,6 @@ function Redeem() {
           handleTransactionPolling={handleRedeemTransactionPolling}
           open={isTransactionDialogOpen}
           transaction={transaction}
-          isComplete={isRedeemComplete}
           onContinue={handleContinue}
         />
       )}
