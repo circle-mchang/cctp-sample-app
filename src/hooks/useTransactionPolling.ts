@@ -1,7 +1,11 @@
 import { useState } from 'react'
 
-import { DestinationDomain } from 'constants/chains'
-import { DEFAULT_API_DELAY, DEFAULT_BLOCKCHAIN_DELAY } from 'constants/index'
+import { Chain, DestinationDomain } from 'constants/chains'
+import {
+  ARC_API_DELAY,
+  DEFAULT_API_DELAY,
+  DEFAULT_BLOCKCHAIN_DELAY,
+} from 'constants/index'
 import { TransactionStatus, useTransactionContext } from 'contexts/AppContext'
 import { useQueryParam } from 'hooks/useQueryParam'
 import useTransaction from 'hooks/useTransaction'
@@ -81,39 +85,52 @@ export function useTransactionPolling(handleComplete: () => void) {
 
   const handleAttestationPolling = () => {
     if (txHash && transaction) {
+      const attestationDelay =
+        transaction.source === Chain.ARC ? ARC_API_DELAY : DEFAULT_API_DELAY
+      let isAttestationRequestInFlight = false
+      let isAttestationHandled = false
       // Polling transaction receipt until status = complete
       const interval = setInterval(async () => {
+        if (isAttestationRequestInFlight || isAttestationHandled) {
+          return
+        }
+        isAttestationRequestInFlight = true
         const sourceDomainId =
           DestinationDomain[
             transaction.source as keyof typeof DestinationDomain
           ]
-        const attestation = await getAttestationByTransaction(
-          sourceDomainId,
-          txHash
-        )
-        if (attestation != null) {
-          const { attestation: signature, message, status } = attestation
+        try {
+          const attestation = await getAttestationByTransaction(
+            sourceDomainId,
+            txHash
+          )
+          if (attestation != null) {
+            const { attestation: signature, message, status } = attestation
 
-          // Success
-          if (
-            status === AttestationStatus.complete &&
-            signature !== null &&
-            message !== null
-          ) {
-            const newTransaction: Transaction = {
-              ...transaction,
-              status: TransactionStatus.COMPLETE,
-              messageBytes: message as unknown as Bytes,
-              signature,
+            // Success
+            if (
+              status === AttestationStatus.complete &&
+              signature !== null &&
+              message !== null &&
+              !isAttestationHandled
+            ) {
+              isAttestationHandled = true
+              const newTransaction: Transaction = {
+                ...transaction,
+                messageBytes: message as unknown as Bytes,
+                signature,
+              }
+              setTransaction(txHash, newTransaction)
+              setSignature(signature)
+
+              handleComplete()
+              clearInterval(interval)
             }
-            setTransaction(txHash, newTransaction)
-            setSignature(signature)
-
-            handleComplete()
-            clearInterval(interval)
           }
+        } finally {
+          isAttestationRequestInFlight = false
         }
-      }, DEFAULT_API_DELAY)
+      }, attestationDelay)
 
       return () => clearInterval(interval)
     }
