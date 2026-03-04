@@ -13,7 +13,7 @@ import {
 
 import { CHAIN_ICONS } from 'assets/chains'
 import { CHAIN_TO_EXPLORER_URL } from 'constants/chains'
-import { TransactionType } from 'contexts/AppContext'
+import { TransactionStatus, TransactionType } from 'contexts/AppContext'
 import { useBeforeUnload } from 'hooks/useBeforeUnload'
 import { copyToClipboard } from 'utils'
 
@@ -27,8 +27,7 @@ interface Props {
   handleTransactionPolling: () => void
   open: boolean
   transaction: Transaction
-  isComplete?: boolean
-  onContinue?: () => void
+  onContinue: () => void
   sx?: SxProps
 }
 
@@ -36,7 +35,6 @@ const TransactionDialog: React.FC<Props> = ({
   handleTransactionPolling,
   open,
   transaction,
-  isComplete = false,
   onContinue,
   sx = {},
 }) => {
@@ -50,11 +48,26 @@ const TransactionDialog: React.FC<Props> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  const chainIcons = useMemo(() => {
-    const source = CHAIN_ICONS[transaction.source as Chain]
-    const target = CHAIN_ICONS[transaction.target as Chain]
-    return { source, target }
+  // Derive completion from transaction state directly — no need for a callback
+  const isComplete = useMemo(() => {
+    if (transaction.type === TransactionType.SEND) {
+      // Send is only fully done once the attestation (signature) is available
+      return (
+        transaction.status === TransactionStatus.COMPLETE &&
+        transaction.signature != null
+      )
+    }
+    // Redeem is done once the receipt is confirmed
+    return transaction.status === TransactionStatus.COMPLETE
   }, [transaction])
+
+  const chainIcons = useMemo(
+    () => ({
+      source: CHAIN_ICONS[transaction.source as Chain],
+      target: CHAIN_ICONS[transaction.target as Chain],
+    }),
+    [transaction]
+  )
 
   const explorerUrl = useMemo(() => {
     const chain =
@@ -113,18 +126,16 @@ const TransactionDialog: React.FC<Props> = ({
                 {shortHash} ↗
               </a>
             </div>
-            {onContinue && (
-              <Button
-                className="mt-16"
-                size="large"
-                variant="contained"
-                onClick={onContinue}
-              >
-                {transaction.type === TransactionType.REDEEM
-                  ? 'DONE'
-                  : 'CONTINUE TO RECEIVE'}
-              </Button>
-            )}
+            <Button
+              className="mt-16"
+              size="large"
+              variant="contained"
+              onClick={onContinue}
+            >
+              {transaction.type === TransactionType.REDEEM
+                ? 'DONE'
+                : 'CONTINUE TO RECEIVE'}
+            </Button>
           </DialogContent>
         </>
       ) : (
