@@ -73,7 +73,12 @@ function Redeem() {
     setIsTransactionDialogOpen(true)
   }
 
-  const handleComplete = () => {
+  // isComplete is derived from transaction state inside TransactionDialog — no-op here
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  const handleComplete = () => {}
+
+  // Called when user clicks "Done" on the success screen
+  const handleContinue = () => {
     setIsTransactionDialogOpen(false)
   }
 
@@ -138,6 +143,7 @@ function Redeem() {
           handleTransactionPolling={handleRedeemTransactionPolling}
           open={isTransactionDialogOpen}
           transaction={transaction}
+          onContinue={handleContinue}
         />
       )}
     </>

@@ -20,7 +20,7 @@ interface TokenMessengerV2Contract {
     mintRecipient: string,
     burnToken: string,
     destinationCaller: string,
-    maxFee: number,
+    maxFee: BigNumber | number,
     minFinalityThreshold: number,
     overrides?: TxOverrides
   ) => Promise<TransactionResponse>
@@ -44,9 +44,6 @@ const useTokenMessenger = (chainId: SupportedChainId | undefined) => {
   // `0x00...00` leaves redeem callable by any address, matching prior app behavior.
   const NO_DESTINATION_CALLER =
     '0x0000000000000000000000000000000000000000000000000000000000000000'
-  // Use Standard Transfer in V2: no fast-transfer fee required.
-  const STANDARD_MAX_FEE = 0
-  const STANDARD_FINALITY_THRESHOLD = 2000
 
   /**
    * Returns transaction response from contract call
@@ -54,13 +51,17 @@ const useTokenMessenger = (chainId: SupportedChainId | undefined) => {
    * @param destinationDomain the Circle defined ID of target chain
    * @param mintRecipient the recipient address on target chain
    * @param burnToken the address of token to burn
+   * @param maxFee max fee in USDC subunits; 0 = Standard Transfer, non-zero = Fast Transfer
+   * @param minFinalityThreshold 1000 = Fast Transfer, 2000 = Standard Transfer
    */
   const depositForBurn = useCallback(
     async (
       amount: BigNumber,
       destinationDomain: DestinationDomain,
       mintRecipient: string,
-      burnToken: string
+      burnToken: string,
+      maxFee: BigNumber | number = 0,
+      minFinalityThreshold = 2000
     ) => {
       if (!library || TOKEN_MESSENGER_CONTRACT_ADDRESS === '') return
       const contract = new Contract(
@@ -87,8 +88,8 @@ const useTokenMessenger = (chainId: SupportedChainId | undefined) => {
           addressToBytes32(mintRecipient),
           burnToken,
           NO_DESTINATION_CALLER,
-          STANDARD_MAX_FEE,
-          STANDARD_FINALITY_THRESHOLD,
+          maxFee,
+          minFinalityThreshold,
           gasOverrides
         )
       } catch (error) {

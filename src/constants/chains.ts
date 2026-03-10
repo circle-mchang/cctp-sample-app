@@ -52,10 +52,19 @@ interface ChainToChainNameMap {
  * Maps a chain to it's readable name
  */
 export const CHAIN_TO_CHAIN_NAME: ChainToChainNameMap = {
-  ETH: 'Ethereum',
-  AVAX: 'Avalanche',
-  ARB: 'Arbitrum',
+  ETH: 'Ethereum Sepolia',
+  AVAX: 'Avalanche Fuji',
+  ARB: 'Arbitrum Sepolia',
   ARC: 'Arc',
+}
+
+/**
+ * Maps a chain to its block explorer base URL
+ */
+export const CHAIN_TO_EXPLORER_URL: ChainToChainNameMap = {
+  ETH: 'https://sepolia.etherscan.io',
+  AVAX: 'https://testnet.snowtrace.io',
+  ARB: 'https://sepolia.arbiscan.io',
 }
 
 /**

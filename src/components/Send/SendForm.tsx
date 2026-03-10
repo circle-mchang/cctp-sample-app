@@ -53,7 +53,7 @@ const CHAIN_SELECT_ITEMS: SelectItem[] = [
 ]
 
 export const DEFAULT_FORM_INPUTS: TransactionInputs = {
-  source: Chain.ARC,
+  source: Chain.ETH,
   target: Chain.AVAX,
   address: '',
   amount: '',
@@ -96,6 +96,12 @@ const SendForm = ({ handleNext, handleUpdateForm, formInputs }: Props) => {
       setWalletUSDCBalance(0)
     }
   }, [account, active, balance])
+
+  useEffect(() => {
+    if (account && active) {
+      handleUpdateForm((state) => ({ ...state, address: account }))
+    }
+  }, [account, active, handleUpdateForm])
 
   useEffect(updateFormIsValid, [updateFormIsValid])
 

@@ -21,6 +21,9 @@ function Send() {
   const navigate = useNavigate()
 
   useEffect(() => {
+    // While the transaction dialog is open (may be showing success), don't auto-navigate away
+    if (isTransactionDialogOpen) return
+
     // Redirect to Redeem page if send tx is complete and signature is fetched or it's a redeem tx
     if (
       transaction &&
@@ -43,7 +46,7 @@ function Send() {
     } else if (txHash) {
       setIsTransactionDialogOpen(true)
     }
-  }, [navigate, transaction, txHash])
+  }, [navigate, transaction, txHash, isTransactionDialogOpen])
 
   const handleNext = () => {
     setIsConfirmationDialogOpen(true)
@@ -55,7 +58,12 @@ function Send() {
     setIsTransactionDialogOpen(true)
   }
 
-  const handleComplete = () => {
+  // isComplete is derived from transaction state inside TransactionDialog — no-op here
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  const handleComplete = () => {}
+
+  // Called when user clicks "Continue" on the success screen
+  const handleContinue = () => {
     setIsTransactionDialogOpen(false)
     navigate({
       pathname: '/redeem',
@@ -100,6 +108,7 @@ function Send() {
           handleTransactionPolling={handleSendTransactionPolling}
           open={isTransactionDialogOpen}
           transaction={transaction}
+          onContinue={handleContinue}
         />
       )}
     </>
